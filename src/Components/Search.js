@@ -14,6 +14,7 @@ const Search = () => {
   const onClickHandler = (e) => {
     e.preventDefault();
     store.getPokemon(query);
+    store.SearchedIndexToNull();
     history.push("/search");
   };
   useEffect(() => {

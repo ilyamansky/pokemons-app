@@ -19,9 +19,18 @@ class Store {
   loadingPokemons = true;
   loadingPokemonTypes = false;
   loadingPokemonSearch = false;
+  index = 0;
 
   constructor() {
     makeAutoObservable(this);
+  }
+
+  SearchedIndexToNull = () => {
+    this.index = 0;
+  }
+
+  changeSearchedIndex = (input) => {
+    this.index = input;
   }
 
   getCount = async () => {

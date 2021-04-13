@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 import PokemonCard from "./PokemonCard";
 import storeContext from "../Context";
 import { observer } from "mobx-react-lite";
@@ -7,11 +7,10 @@ import PokemonModal from "./PokemonModal";
 
 const SearchResults = () => {
   const store = useContext(storeContext);
-  const [index, setIndex] = useState(0);
   if (store.queryStatus == false)
     return <p>No pokemon has been found! Try again!</p>;
   if (store.loadingPokemonSearch) return <div>...loading</div>;
-  if (!store.query[index]) return null;
+  if (!store.query[store.index]) return null;
 
   return (
     <div>
@@ -23,7 +22,7 @@ const SearchResults = () => {
           {store.query.map((el, i) => (
             <PokemonCard
               clicked={() => {
-                setIndex(i);
+                store.changeSearchedIndex(i);
                 store.changeShow();
               }}
               key={el.name}
@@ -35,12 +34,12 @@ const SearchResults = () => {
         </Row>
       </Container>
       <PokemonModal
-        title={store.query[index].name}
-        src={store.query[index].sprites.front_default}
-        backSrc={store.query[index].sprites.back_default}
-        height={store.query[index].height}
-        weight={store.query[index].weight}
-        type={store.query[index].types.map((el) => `${el.type.name} `)}
+        title={store.query[store.index].name}
+        src={store.query[store.index].sprites.front_default}
+        backSrc={store.query[store.index].sprites.back_default}
+        height={store.query[store.index].height}
+        weight={store.query[store.index].weight}
+        type={store.query[store.index].types.map((el) => `${el.type.name} `)}
       />
     </div>
   );

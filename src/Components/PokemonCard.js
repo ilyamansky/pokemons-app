@@ -1,6 +1,5 @@
 import React from "react";
 import PropTypes from "prop-types";
-//import { observer } from "mobx-react-lite";
 import { Card } from "react-bootstrap";
 
 const PokemonCard = (props) => {
@@ -23,4 +22,4 @@ PokemonCard.propTypes = {
   type: PropTypes.array,
 };
 
-export default /*observer*/(PokemonCard);
+export default (PokemonCard);
