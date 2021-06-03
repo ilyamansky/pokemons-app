@@ -2,11 +2,11 @@ import axios from "axios";
 import { makeAutoObservable, runInAction } from "mobx";
 
 class Store {
-  count = 0;
+  state = "";
   query = [];
   queryStatus = true;
   pokemons = [];
-  allPokemonNames = [];
+  pokemonsUrls = [];
   currentUrl = "https://pokeapi.co/api/v2/pokemon/";
   show = false;
   typesUrl = "https://pokeapi.co/api/v2/type/";
@@ -19,37 +19,11 @@ class Store {
   loadingPokemons = true;
   loadingPokemonTypes = false;
   loadingPokemonSearch = false;
-  index = 0;
+  pokemonsByTypeExist = false;
 
   constructor() {
     makeAutoObservable(this);
   }
-
-  SearchedIndexToNull = () => {
-    this.index = 0;
-  }
-
-  changeSearchedIndex = (input) => {
-    this.index = input;
-  }
-
-  getCount = async () => {
-    const response = await axios
-      .get("https://pokeapi.co/api/v2/pokemon")
-      .then((res) => res.data.count);
-    runInAction(() => {
-      this.count = response;
-    });
-  };
-
-  getAllPokemonNames = async () => {
-    this.getCount();
-    axios
-      .get(`https://pokeapi.co/api/v2/pokemon?limit=${this.count}`)
-      .then((res) => {
-        this.allPokemonNames = res.data.results.map((el) => el.name);
-      });
-  };
 
   changePages = (e) => {
     this.limit = e.target.value;
@@ -62,20 +36,13 @@ class Store {
   getPokemon = async (input) => {
     this.loadingPokemonSearch = true;
     this.queryStatus = true;
-    const searchedPokemons = this.allPokemonNames.filter((el) =>
-      el.includes(input.toLowerCase().trim())
-    );
-    if (searchedPokemons.length == 0) return (this.queryStatus = false);
-    if (input.trim() == "") return (this.queryStatus = false);
+    if (input.toLowerCase().trim() === "") return (this.queryStatus = false);
     try {
-      const requests = searchedPokemons.map((el) =>
-        axios.get(`https://pokeapi.co/api/v2/pokemon/${el}`)
-      );
-      const results = await Promise.all(
-        requests.map((el) => el.catch((e) => e))
-      );
+      const result = await axios
+        .get(`https://pokeapi.co/api/v2/pokemon/${input}`)
+        .then((res) => res.data);
       runInAction(() => {
-        this.query = results.map((el) => el.data);
+        this.query = result;
         this.queryStatus = true;
         this.loadingPokemonSearch = false;
       });
@@ -88,7 +55,7 @@ class Store {
     }
   };
   getPokemons = async () => {
-    this.loadingPokemons = true;
+    this.state = "pending";
     const response = await axios
       .get(`${this.currentUrl}?limit=${this.limit}&offset=${this.offset}`)
       .then((res) => res.data);
@@ -98,13 +65,18 @@ class Store {
     });
     const urls = response.results.map((el) => el.url);
     const requests = urls.map((el) => axios.get(el));
-    const results = await Promise.all(requests.map((el) => el.catch((e) => e)));
-    const validResults = results.filter((result) => !(result instanceof Error));
-    runInAction(() => {
-      this.pokemons = validResults.map((el) => el.data);
-      this.loadingPokemons = false;
-    });
+    try {
+      const results = await Promise.all(requests);
+      runInAction(() => {
+        this.pokemons = results.map((el) => el.data);
+        this.state = "done";
+      });
+    } catch (e) {
+      this.state = "error";
+      console.log(e);
+    }
   };
+
   goToPreviousUrl = () => {
     this.offset = +this.offset - +this.limit;
     if (+this.offset < 0) {
@@ -124,17 +96,28 @@ class Store {
   };
   getPokemonsByType = async (type) => {
     this.loadingPokemonTypes = true;
+    this.pokemonsByTypeExist = false;
+    this.state = "pending";
     const response = await axios
       .get(`https://pokeapi.co/api/v2/type/${type}`)
       .then((res) => res.data.pokemon);
+    runInAction(() => {
+      if (response.length === 0) {
+        this.state = "done";
+        this.pokemonsByTypeExist = true;
+      }
+    });
     const urls = response.map((el) => el.pokemon.url);
     const requests = urls.map((el) => axios.get(el));
-    const results = await Promise.all(requests.map((el) => el.catch((e) => e)));
-    const validResults = results.filter((result) => !(result instanceof Error));
-    runInAction(() => {
-      this.pokemonsByType = validResults.map((el) => el.data);
-      this.loadingPokemonTypes = false;
-    });
+    try {
+      const results = await Promise.all(requests);
+      runInAction(() => {
+        this.pokemonsByType = results.map((el) => el.data);
+        this.state = "done";
+      });
+    } catch (e) {
+      this.state = "error";
+    }
   };
 }
 const store = new Store();

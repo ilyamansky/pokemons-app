@@ -20,9 +20,8 @@ const PokemonList = () => {
     store.limit,
     store.offset,
   ]);
-  if (store.loadingPokemons) return <div>loading...</div>;
+  if (store.state === "pending") return <div>Loading...</div>;
   if (!store.pokemons[index]) return null;
-
   return (
     <div>
       <Container>

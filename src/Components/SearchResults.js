@@ -7,10 +7,10 @@ import PokemonModal from "./PokemonModal";
 
 const SearchResults = () => {
   const store = useContext(storeContext);
-  if (store.queryStatus == false)
+  if (store.queryStatus === false)
     return <p>No pokemon has been found! Try again!</p>;
   if (store.loadingPokemonSearch) return <div>...loading</div>;
-  if (!store.query[store.index]) return null;
+  if (store.query.length === 0) return null;
 
   return (
     <div>
@@ -19,27 +19,24 @@ const SearchResults = () => {
           style={{ marginTop: "10px" }}
           className="justify-content-md-center"
         >
-          {store.query.map((el, i) => (
-            <PokemonCard
-              clicked={() => {
-                store.changeSearchedIndex(i);
-                store.changeShow();
-              }}
-              key={el.name}
-              title={el.name}
-              src={el.sprites.front_default}
-              type={el.types.map((el) => `${el.type.name} `)}
-            />
-          ))}
+          <PokemonCard
+            clicked={() => {
+              store.changeShow();
+            }}
+            key={store.query.name}
+            title={store.query.name}
+            src={store.query.sprites.front_default}
+            type={store.query.types.map((el) => `${el.type.name} `)}
+          />
         </Row>
       </Container>
       <PokemonModal
-        title={store.query[store.index].name}
-        src={store.query[store.index].sprites.front_default}
-        backSrc={store.query[store.index].sprites.back_default}
-        height={store.query[store.index].height}
-        weight={store.query[store.index].weight}
-        type={store.query[store.index].types.map((el) => `${el.type.name} `)}
+        title={store.query.name}
+        src={store.query.sprites.front_default}
+        backSrc={store.query.sprites.back_default}
+        height={store.query.height}
+        weight={store.query.weight}
+        type={store.query.types.map((el) => `${el.type.name} `)}
       />
     </div>
   );

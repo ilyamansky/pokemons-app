@@ -22,4 +22,4 @@ PokemonCard.propTypes = {
   type: PropTypes.array,
 };
 
-export default (PokemonCard);
+export default PokemonCard;

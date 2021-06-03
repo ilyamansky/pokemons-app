@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useContext } from "react";
 import storeContext from "../Context";
 import { observer } from "mobx-react-lite";
 import { Form, Button, Container } from "react-bootstrap";
@@ -14,12 +14,11 @@ const Search = () => {
   const onClickHandler = (e) => {
     e.preventDefault();
     store.getPokemon(query);
-    store.SearchedIndexToNull();
     history.push("/search");
   };
-  useEffect(() => {
-    store.getAllPokemonNames();
-  }, [store.count]);
+  //useEffect(() => {
+  //store.getAllPokemonNames();
+  //}, [store.count]);
   if (!store) return null;
   return (
     <div>

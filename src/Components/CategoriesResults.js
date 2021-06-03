@@ -8,9 +8,14 @@ import { Container, Row } from "react-bootstrap";
 const CategoriesResults = () => {
   const store = useContext(storeContext);
   const [index, setIndex] = useState(0);
-  if (store.loadingPokemonTypes) return <div>...loading</div>;
-  if (!store.pokemonsByType) return null;
+  if (store.pokemonsByTypeExist == true) return <div>No pokemons in this category yet!</div>
+  if (store.state == "pending") return <div>Loading...</div>;
+  
+  
   if (!store.pokemonsByType[index]) return null;
+  
+  
+  
 
   return (
     <div>
