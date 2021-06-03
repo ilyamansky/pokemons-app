@@ -33,10 +33,11 @@ class Store {
     this.show = !this.show;
   };
 
-  getPokemon = async (input) => {
+  getPokemon = async (searchedInput) => {
+    const input = searchedInput.toLowerCase().trim();
     this.loadingPokemonSearch = true;
     this.queryStatus = true;
-    if (input.toLowerCase().trim() === "") return (this.queryStatus = false);
+    if (input === "") return (this.queryStatus = false);
     try {
       const result = await axios
         .get(`https://pokeapi.co/api/v2/pokemon/${input}`)
